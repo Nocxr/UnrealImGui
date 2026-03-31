@@ -384,7 +384,14 @@ typedef struct
 #ifdef STB_TEXTEDIT_IMPLEMENTATION
 
 #ifndef STB_TEXTEDIT_memmove
+#if defined(__clang__) && __has_warning("-Wmodules-import-nested-redundant")
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmodules-import-nested-redundant"
+#endif
 #include <string.h>
+#if defined(__clang__) && __has_warning("-Wmodules-import-nested-redundant")
+#pragma clang diagnostic pop
+#endif
 #define STB_TEXTEDIT_memmove memmove
 #endif
 

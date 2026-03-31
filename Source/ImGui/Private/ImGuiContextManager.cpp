@@ -269,13 +269,33 @@ void FImGuiContextManager::BuildFontAtlas(const TMap<FName, TSharedPtr<ImFontCon
 			FName CustomFontName = CustomFontPair.Key;
 			TSharedPtr<ImFontConfig> CustomFontConfig = CustomFontPair.Value;
 
-			// Set font name for debugging
 			if (CustomFontConfig.IsValid())
 			{
-				strcpy_s(CustomFontConfig->Name, 40, TCHAR_TO_ANSI(*CustomFontName.ToString()));
+				// Use a fixed local buffer to avoid dangling pointer from temporary converters
+				const FString CustomFontNameString = CustomFontName.ToString();
+				FTCHARToUTF8 Converted(*CustomFontNameString);
+
+				// ImFontConfig::Name is a fixed-size char[40]. Prepare a bounded source buffer.
+				char NameUtf8Buf[40];
+				const int32 SrcLen = FMath::Min<int32>(Converted.Length(), 39); // reserve 1 for NUL
+				if (SrcLen > 0)
+				{
+					std::memcpy(NameUtf8Buf, Converted.Get(), static_cast<size_t>(SrcLen));
+				}
+				// Null-terminate and pad remaining (optional)
+				NameUtf8Buf[SrcLen] = '\0';
+
+#if defined(_MSC_VER)
+				// On MSVC/Windows, use secure strcpy_s with explicit buffer size (40)
+				strcpy_s(CustomFontConfig->Name, 40, NameUtf8Buf);
+#else
+				// On other platforms, use strncpy up to 39 chars and ensure null-termination
+				std::strncpy(CustomFontConfig->Name, NameUtf8Buf, 39);
+				CustomFontConfig->Name[39] = '\0';
+#endif
 			}
-		
-			FontAtlas.AddFont(CustomFontConfig.Get());
+
+            FontAtlas.AddFont(CustomFontConfig.Get());
 		}
 
 		unsigned char* Pixels;
@@ -301,3 +321,4 @@ void FImGuiContextManager::RebuildFontAtlas()
 
 	BuildFontAtlas(FImGuiModule::Get().GetProperties().GetCustomFonts());
 }
+
