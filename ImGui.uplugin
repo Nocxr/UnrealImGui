@@ -2,11 +2,11 @@
 	"FileVersion": 3,
 	"Version": 1,
 	"VersionName": "1.22",
-	"FriendlyName": "ImGui",
-	"Description": "",
+	"FriendlyName": "Dear ImGui (Patched)",
+	"Description": "Mac patched version of BenUI's last version of Dear ImGui",
 	"Category": "Debug",
-	"CreatedBy": "",
-	"CreatedByURL": "",
+	"CreatedBy": "Nocxr",
+	"CreatedByURL": "https://github.com/nocxr/unrealimgui",
 	"DocsURL": "",
 	"MarketplaceURL": "",
 	"SupportURL": "",
@@ -25,5 +25,6 @@
 			"Name": "EnhancedInput",
 			"Enabled": true
 		}
-	]
+	],
+	"IsExperimentalVersion": false
 }
